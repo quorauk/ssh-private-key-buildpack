@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -eo pipefail
+
+# Set the layersdir variable to be the first argument from the build lifecycle
+layersdir=$1
+env_dir=$2/env
+
+echo "---> SSH Buildpack" 
+SSH_KEY="$(cat $env_dir/SSH_PRIVATE_KEY)"
+
+if [[ $SSH_KEY ]] ; then
+  echo "---> Adding ssh key"
+
+  mkdir -p $layersdir/ssh
+
+  #provide ssh key to future buildpacks
+  echo "${SSH_KEY}" > $layersdir/ssh/id_rsa
+  chmod 400 $layersdir/ssh/id_rsa
+
+  #set up known hosts
+  touch $layersdir/ssh/known_hosts
+  eval `ssh-agent -s`
+  ssh-keyscan github.com > $layersdir/ssh/known_hosts
+
+  #set SSH_DIRECTORY environment variable for future buildpacks to use
+  echo "$layersdir/ssh" > $env_dir/SSH_DIRECTORY
+
+  # create script for future buildpacks to set up ssh keys
+  echo "#!/usr/bin/env bash
+echo "ssh key \$SSH_DIRECTORY"
+echo \"setting up ssh key\"
+ln -s \$SSH_DIRECTORY \$HOME/.ssh" > "$layersdir/ssh/setup-ssh"
+  chmod +x $layersdir/ssh/setup-ssh
+
+  echo -e "cache = false\nbuild = true\nlaunch = false" > "$layersdir/ssh.toml"
+else 
+  echo "---> SSH key not detected"
+fi
