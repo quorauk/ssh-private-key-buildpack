@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
 set -eo pipefail
 
-exit 0
+env_dir="$1/env"
+if [[ -f "$env_dir/SSH_PRIVATE_KEY" ]]; then
+  exit 0
+else
+  exit 1
+fi
