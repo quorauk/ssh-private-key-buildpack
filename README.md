@@ -18,7 +18,7 @@ export SSH_DIRECTORY="$(cat $env_dir/SSH_DIRECTORY)"
 
 echo "---> Java Buildpack" 
 if [[ $SSH_DIRECTORY ]] ; then
-  bash $SSH_DIRECTORY/setup-ssh
+  setup-ssh
 fi
 
 # git clone git@github.com:username/private-repo.git

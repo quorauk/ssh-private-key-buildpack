@@ -10,7 +10,7 @@ SSH_KEY="$(cat $env_dir/SSH_PRIVATE_KEY)"
 
 echo "---> Adding ssh key"
 
-mkdir -p $layersdir/ssh
+mkdir -p $layersdir/ssh/bin
 
 #provide ssh key to future buildpacks
 echo "${SSH_KEY}" > $layersdir/ssh/id_rsa
@@ -28,7 +28,7 @@ echo "$layersdir/ssh" > $env_dir/SSH_DIRECTORY
 echo "#!/usr/bin/env bash
 echo "ssh key \$SSH_DIRECTORY"
 echo \"setting up ssh key\"
-ln -s \$SSH_DIRECTORY \$HOME/.ssh" > "$layersdir/ssh/setup-ssh"
-chmod +x $layersdir/ssh/setup-ssh
+ln -s \$SSH_DIRECTORY \$HOME/.ssh" > "$layersdir/ssh/bin/setup-ssh"
+chmod +x $layersdir/ssh/bin/setup-ssh
 
 echo -e "cache = false\nbuild = true\nlaunch = false" > "$layersdir/ssh.toml"
